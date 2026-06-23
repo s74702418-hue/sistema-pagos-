@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Pagos Deportivos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Urbanist:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* --- CORE DE DISEÑO PREMIUM --- */
+        :root {
+            --bg-color: #060913;
+            --card-bg: rgba(15, 23, 42, 0.45);
+            --text-main: #ffffff;
+            --text-dim: #94a3b8;
+            --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #d946ef 100%);
+            --border-gradient: linear-gradient(135deg, rgba(59, 130, 246, 0.4) 0%, rgba(217, 70, 239, 0.4) 100%);
+            --nav-bg: rgba(10, 15, 30, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --font-title: 'Urbanist', sans-serif;
+            --font-body: 'Poppins', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .bg-glows {
+            position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; z-index: -1; overflow: hidden; pointer-events: none;
+        }
+        .glow-1 {
+            position: absolute; top: -10%; right: -10%; width: 700px; height: 700px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, rgba(217, 70, 239, 0.1) 50%, transparent 70%);
+            border-radius: 50%; animation: floatGlow 10s infinite alternate;
+        }
+        .glow-2 {
+            position: absolute; bottom: -10%; left: -10%; width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(139, 92, 246, 0.1) 50%, transparent 70%);
+            border-radius: 50%; animation: floatGlow 15s infinite alternate-reverse;
+        }
+
+        @keyframes floatGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 30px) scale(1.1); }
+        }
+
+        h1, h2, h3 { font-family: var(--font-title); font-weight: 900; letter-spacing: -1px; }
+
+        .gradient-title {
+            background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-size: 38px; text-align: center; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;
+        }
+
+        .glass-card {
+            background: var(--card-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border); position: relative; border-radius: 24px; padding: 35px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4); width: 100%;
+        }
+
+        .glass-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 24px; padding: 1px;
+            background: var(--border-gradient); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
+        }
+
+        .wrapper { flex: 1; padding: 40px 20px 120px 20px; max-width: 800px; margin: 0 auto; width: 100%; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600;
+            color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .search-box-container { position: relative; margin-bottom: 25px; }
+        .search-box-container i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-dim); }
+        .search-input { padding-left: 45px !important; }
+
+        input, select {
+            width: 100%; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--glass-border);
+            padding: 16px; border-radius: 14px; color: #fff; font-family: var(--font-body); font-size: 16px; transition: all 0.3s ease;
+        }
+        input:focus, select:focus { outline: none; border-color: #d946ef; background: rgba(255, 255, 255, 0.08); box-shadow: 0 0 15px rgba(217, 70, 239, 0.2); }
+        select option { background: #0f172a; color: #fff; }
+
+        .btn-luxury {
+            background: var(--primary-gradient); border: none; padding: 16px; border-radius: 14px; color: white;
+            font-family: var(--font-title); font-weight: 700; font-size: 16px; letter-spacing: 1px; cursor: pointer;
+            transition: all 0.3s ease; width: 100%; text-transform: uppercase; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.35);
+        }
+        .btn-luxury:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(217, 70, 239, 0.5); opacity: 0.95; }
+
+        .screen { display: none; }
+        .screen.active { display: block; animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        /* --- CUADRÍCULA DE DEPORTES --- */
+        .sports-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 20px; margin-top: 30px; }
+        .sport-card {
+            aspect-ratio: 1/1; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            border-radius: 20px; font-weight: 700; font-size: 16px; color: white; cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        .sport-card i { font-size: 32px; margin-bottom: 12px; }
+        .sport-card:hover { transform: scale(1.08) translateY(-5px); box-shadow: 0 15px 30px rgba(139, 92, 246, 0.3); }
+
+        /* --- TABLAS --- */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; color: var(--text-dim); padding: 16px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--glass-border); }
+        td { padding: 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.03); font-size: 15px; }
+
+        .status-badge { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+        .status-completed { background: linear-gradient(135deg, rgba(52, 211, 153, 0.2) 0%, rgba(16, 185, 129, 0.2) 100%); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
+        .status-pending { background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(217, 115, 22, 0.2) 100%); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
+
+        /* --- COMPONENTE ATLETA --- */
+        .athlete-container-block { margin-bottom: 15px; border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.01); }
+        .athlete-card-premium { display: flex; align-items: center; justify-content: space-between; padding: 20px; background: rgba(255,255,255,0.02); }
+        .athlete-info { display: flex; align-items: center; gap: 15px; }
+        .athlete-info i { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 24px; }
+        .athlete-stats { text-align: right; }
+        .count-badge {
+            background: var(--primary-gradient); padding: 7px 18px; border-radius: 50px; font-size: 12px; font-weight: bold;
+            color: #fff; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s; border: none; box-shadow: 0 4px 10px rgba(139, 92, 246, 0.2);
+        }
+        .count-badge:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(217, 70, 239, 0.4); }
+        .athlete-history-panel { display: none; padding: 20px; background: rgba(0, 0, 0, 0.3); border-top: 1px solid rgba(255, 255, 255, 0.03); animation: fadeIn 0.3s ease; }
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.03); font-size: 14px; }
+        .history-item:last-child { border: none; }
+
+        /* --- PERFIL PREMIUM CON AVATAR --- */
+        .premium-profile-card {
+            background: linear-gradient(145deg, rgba(20, 30, 55, 0.9) 0%, rgba(10, 15, 30, 0.95) 100%);
+            border-radius: 24px; padding: 30px; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 50px rgba(0,0,0,0.5); margin-bottom: 25px;
+        }
+        .premium-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .premium-badge { background: var(--primary-gradient); padding: 5px 14px; border-radius: 30px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; display: inline-flex; align-items: center; gap: 6px; }
+        
+        .switcher-container { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+        .switcher-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .sport-select-menu {
+            background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.15); padding: 8px 14px;
+            border-radius: 50px; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; outline: none;
+            transition: all 0.3s ease; font-family: var(--font-body); width: auto; min-width: 130px;
+        }
+        .sport-select-menu:focus, .sport-select-menu:hover { background: var(--primary-gradient); border-color: transparent; box-shadow: 0 4px 15px rgba(217, 70, 239, 0.4); }
+
+        .premium-main { display: flex; align-items: center; gap: 20px; text-align: left; margin-bottom: 25px; }
+        
+        .premium-avatar-container { position: relative; cursor: pointer; }
+        .premium-avatar {
+            width: 85px; height: 85px; border-radius: 50%; background: #1e293b; display: flex; align-items: center; justify-content: center;
+            font-size: 42px; border: 3px solid #d946ef; box-shadow: 0 8px 25px rgba(217, 70, 239, 0.3); transition: transform 0.3s;
+        }
+        .premium-avatar:hover { transform: scale(1.05); }
+        .avatar-edit-hint { position: absolute; bottom: 0; right: 0; background: #fff; color: #000; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
+        
+        .premium-meta h2 { font-size: 24px; font-weight: 700; line-height: 1.2; margin-bottom: 4px; }
+        .premium-meta p { color: var(--text-dim); font-size: 13px; display: flex; align-items: center; gap: 6px; }
+        
+        .premium-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px; }
+        .stat-premium-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); padding: 15px; border-radius: 16px; text-align: center; }
+        .stat-premium-box i { font-size: 18px; margin-bottom: 6px; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-premium-box .stat-val { font-family: var(--font-title); font-size: 20px; font-weight: 900; }
+        .stat-premium-box .stat-lbl { font-size: 11px; color: var(--text-dim); text-transform: uppercase; }
+
+        /* --- MODAL FLOTANTE DE AVATARES --- */
+        .avatar-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px); z-index: 2000; align-items: center; justify-content: center;
+        }
+        .avatar-modal-content { background: #0f172a; border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; padding: 30px; max-width: 400px; width: 90%; text-align: center; }
+        .avatar-options-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 25px 0; }
+        .avatar-opt { font-size: 40px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 16px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
+        .avatar-opt:hover { background: rgba(255,255,255,0.1); transform: scale(1.1); border-color: #3b82f6; }
+
+        /* --- CUENTAS GUARDADAS --- */
+        .saved-accounts-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 18px; padding: 20px; margin-top: 20px; text-align: left; }
+        .account-item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.02); margin-bottom: 10px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+        .account-item-row:hover { background: rgba(255,255,255,0.05); border-color: #8b5cf6; }
+        .account-item-left { display: flex; align-items: center; gap: 12px; }
+        .account-item-avatar { width: 35px; height: 35px; border-radius: 50%; background: var(--primary-gradient); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; }
+        .account-del-btn { background: none; border: none; color: #ef4444; padding: 5px 10px; cursor: pointer; font-size: 14px; }
+        .account-del-btn:hover { color: #f87171; }
+
+        /* --- NAVEGACIÓN --- */
+        nav {
+            position: fixed; bottom: 0; left: 0; right: 0; height: 85px; background: var(--nav-bg); backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px); border-top: 1px solid var(--glass-border); display: none; justify-content: space-around; align-items: center; z-index: 1000; padding: 0 10px; box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
+        }
+        nav a { color: var(--text-dim); text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: 600; transition: all 0.3s ease; cursor: pointer; gap: 4px; }
+        nav a i { font-size: 22px; transition: all 0.3s ease; }
+        nav a.active { color: #ffffff; transform: translateY(-5px); }
+        nav a.active i { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0px 0px 8px rgba(217, 70, 239, 0.6)); }
+
+        .pink-premium-mode {
+            --bg-color: #fff1f2; --card-bg: rgba(255, 255, 255, 0.82); --text-main: #4c0519; --text-dim: #9d174d;
+            --primary-gradient: linear-gradient(135deg, #ff69b4 0%, #f43f5e 50%, #fda4af 100%); --border-gradient: linear-gradient(135deg, #ff69b4, #fda4af);
+            --nav-bg: rgba(255, 241, 242, 0.92); --glass-border: rgba(251, 113, 133, 0.25);
+        }
+        .pink-premium-mode input, .pink-premium-mode select { background: rgba(255, 255, 255, 0.6); border-color: rgba(251, 113, 133, 0.3); color: #4c0519; }
+        .pink-premium-mode th { color: #9d174d; }
+        .pink-premium-mode .athlete-container-block { background: rgba(255, 255, 255, 0.5); border-color: rgba(0,0,0,0.06); color: #4c0519; }
+        .pink-premium-mode .premium-profile-card { background: linear-gradient(145deg, #fff1f2 0%, #ffe4e6 100%); border-color: rgba(251, 113, 133, 0.3); }
+        .pink-premium-mode .avatar-modal-content { background: #fff1f2; color: #4c0519; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-glows">
+        <div class="glow-1"></div>
+        <div class="glow-2"></div>
+    </div>
+
+    <div class="wrapper">
+
+        <div id="screen-auth" class="screen active">
+            <div class="glass-card">
+                <h1 class="gradient-title">Sistema de Pagos</h1>
+                <div id="login-box">
+                    <h2 style="text-align: center; margin-bottom: 25px; font-weight: 400;">Iniciar Sesión</h2>
+                    <div class="form-group">
+                        <label>Correo Electrónico</label>
+                        <input type="email" id="login-email" placeholder="ejemplo@correo.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña</label>
+                        <input type="password" id="login-pass" placeholder="********">
+                    </div>
+                    <button class="btn-luxury" onclick="handleLogin()">Ingresar de Forma Segura</button>
+                    <p style="text-align: center; font-size: 14px; margin-top: 25px; color: var(--text-dim);">
+                        ¿No tienes cuenta administrativa? <a href="#" onclick="toggleAuth(false)" style="color: #d946ef; font-weight: 600; text-decoration: none;">Crear Cuenta</a>
+                    </p>
+                </div>
+
+                <div id="register-box" style="display: none;">
+                    <h2 style="text-align: center; margin-bottom: 25px; font-weight: 400;">Registrar Administrador</h2>
+                    <div class="form-group">
+                        <label>Nombre Completo</label>
+                        <input type="text" id="reg-name" placeholder="Tu nombre completo">
+                    </div>
+                    <div class="form-group">
+                        <label>Correo Electrónico</label>
+                        <input type="email" id="reg-email" placeholder="admin@correo.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña Maestra</label>
+                        <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres">
+                    </div>
+                    <button class="btn-luxury" onclick="handleRegister()">Registrarse e Ingresar</button>
+                    <p style="text-align: center; font-size: 14px; margin-top: 25px; color: var(--text-dim);">
+                        ¿Ya posees una cuenta? <a href="#" onclick="toggleAuth(true)" style="color: #8b5cf6; font-weight: 600; text-decoration: none;">Iniciar Sesión</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-sports-select" class="screen">
+            <div class="glass-card">
+                <h1 class="gradient-title">Elegir Disciplina</h1>
+                <p style="text-align: center; color: var(--text-dim); margin-bottom: 10px;">Selecciona el ecosistema deportivo a gestionar.</p>
+                <div class="sports-grid" id="main-sports-grid"></div>
+            </div>
+        </div>
+
+        <div id="sec-inicio" class="screen">
+            <div class="glass-card">
+                <h1 class="gradient-title" style="font-size: 32px; text-align: left;">Registro Central</h1>
+                <p style="color: var(--text-dim); margin-bottom: 25px;">Ecosistema activo: <span class="active-sport-badge" style="font-weight: 700; color: #fff; background: var(--primary-gradient); padding: 4px 14px; border-radius: 20px;">Deporte</span></p>
+                
+                <div class="form-group">
+                    <label>Nombre Completo del Atleta</label>
+                    <input type="text" id="input-athlete-name" placeholder="Ejemplo: Roberto Carlos Medina">
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label>Monto de la Cuota ($)</label>
+                        <input type="number" id="input-payment-amount" placeholder="50.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Canal / Tipo de Pago</label>
+                        <select id="input-payment-type">
+                            <option>Efectivo presencial</option>
+                            <option>Transferencia Bancaria</option>
+                            <option>Código QR Inmediato</option>
+                            <option>Tarjeta Crédito / Débito</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Estado Inicial del Pago</label>
+                    <select id="input-payment-status">
+                        <option value="Completado">🟢 Completado / Pagado</option>
+                        <option value="Pendiente">🟡 Pendiente / Por Cobrar</option>
+                    </select>
+                </div>
+
+                <button class="btn-luxury" style="margin-top: 10px;" onclick="saveData()">Procesar y Guardar Transacción</button>
+            </div>
+        </div>
+
+        <div id="sec-pagos" class="screen">
+            <div class="glass-card">
+                <h1 class="gradient-title" style="font-size: 32px; text-align: left; margin-bottom: 5px;">Libro de Caja</h1>
+                <p style="color: var(--text-dim); margin-bottom: 20px;">Mostrando pagos de: <span class="active-sport-badge" style="font-weight:bold; color:#fff;">Deporte</span></p>
+                
+                <div class="search-box-container">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="search-payments" class="search-input" placeholder="Buscar atleta..." oninput="filterPayments()">
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Atleta</th>
+                                <th>Deporte</th>
+                                <th>Monto</th>
+                                <th>Método</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payments-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="sec-atletas" class="screen">
+            <div class="glass-card">
+                <h1 class="gradient-title" style="font-size: 32px; text-align: left; margin-bottom: 5px;">Atletas Inscritos</h1>
+                <p style="color: var(--text-dim); margin-bottom: 20px;">Disciplina actual: <span class="active-sport-badge" style="font-weight:bold; color:#fff;">Deporte</span></p>
+                
+                <div class="search-box-container">
+                    <i class="fa-solid fa-user-gear"></i>
+                    <input type="text" id="search-athletes" class="search-input" placeholder="Buscar atleta por nombre..." oninput="filterAthletes()">
+                </div>
+
+                <div id="athletes-list"></div>
+            </div>
+        </div>
+
+        <div id="sec-perfil" class="screen">
+            <div class="premium-profile-card">
+                <div class="premium-header">
+                    <div class="premium-badge"><i class="fa-solid fa-crown"></i> Admin Pro</div>
+                    
+                    <div class="switcher-container">
+                        <span class="switcher-label">Cambiar Deporte</span>
+                        <select class="sport-select-menu" id="profile-sport-dropdown" onchange="selectSport(this.value)">
+                            </select>
+                    </div>
+                </div>
+                <div class="premium-main">
+                    <div class="premium-avatar-container" onclick="openAvatarModal()">
+                        <div class="premium-avatar" id="profile-avatar-display">🥷</div>
+                        <div class="avatar-edit-hint"><i class="fa-solid fa-pen"></i></div>
+                    </div>
+                    <div class="premium-meta">
+                        <h2 id="profile-name">Administrador</h2>
+                        <p id="profile-email-lbl"><i class="fa-regular fa-envelope"></i> admin@ecosistema.com</p>
+                    </div>
+                </div>
+
+                <div class="premium-stats-grid">
+                    <div class="stat-premium-box">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <div class="stat-val" id="stat-total-money">$0.00</div>
+                        <div class="stat-lbl" id="lbl-money-sport">En Deporte</div>
+                    </div>
+                    <div class="stat-premium-box">
+                        <i class="fa-solid fa-users"></i>
+                        <div class="stat-val" id="stat-total-athletes">0</div>
+                        <div class="stat-lbl" id="lbl-athletes-sport">Atletas Activos</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-luxury" style="background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%);" onclick="logout()">Cambiar o Cerrar Cuenta</button>
+
+            <div class="saved-accounts-box">
+                <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 15px; color: #fff;"><i class="fa-solid fa-users-viewfinder"></i> Cuentas Guardadas en este Dispositivo</h3>
+                <div id="saved-accounts-list-container"></div>
+            </div>
+        </div>
+
+        <div id="sec-personalizacion" class="screen">
+            <div class="glass-card">
+                <h1 class="gradient-title" style="font-size: 32px; text-align: left; margin-bottom: 20px;">Estilo & Diseño</h1>
+                <div class="form-group">
+                    <label>Tipografía Integral</label>
+                    <select onchange="changeFont(this.value)">
+                        <option value="'Poppins'">Moderna (Poppins)</option>
+                        <option value="'Urbanist'">Deportiva Compacta (Urbanist)</option>
+                        <option value="'Georgia'">Elegante Tradicional (Serif)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-top: 25px;">
+                    <label>Mezclas Maestras de Color</label>
+                    <div class="theme-buttons">
+                        <button class="btn-luxury" style="background: linear-gradient(135deg, #ff69b4 0%, #f43f5e 50%, #fda4af 100%); color: #fff;" onclick="setTheme('pink')">¡Modo Rosa Mezclado!</button>
+                        <button class="btn-luxury" style="background: linear-gradient(135deg, #0f172a 0%, #020617 100%);" onclick="setTheme('dark')">Oscuro Interestelar</button>
+                        <button class="btn-luxury" style="background: linear-gradient(135deg, #6366f1 0%, #3b82f6 50%, #6366f1 100%);" onclick="setTheme('purple')">Azul Eléctrico</button>
+                        <button class="btn-luxury" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);" onclick="setTheme('default')">Mezcla Original</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <nav id="main-nav">
+        <a onclick="showSection('inicio')" id="nav-inicio" class="active"><i class="fa-solid fa-square-plus"></i><span>Ingreso</span></a>
+        <a onclick="showSection('pagos')" id="nav-pagos"><i class="fa-solid fa-wallet"></i><span>Pagos</span></a>
+        <a onclick="showSection('atletas')" id="nav-atletas"><i class="fa-solid fa-users-line"></i><span>Atletas</span></a>
+        <a onclick="showSection('personalizacion')" id="nav-personalizacion"><i class="fa-solid fa-palette"></i><span>Diseño</span></a>
+        <a onclick="showSection('perfil')" id="nav-perfil"><i class="fa-solid fa-circle-user"></i><span>Perfil</span></a>
+    </nav>
+
+    <div class="avatar-modal" id="avatarModal">
+        <div class="avatar-modal-content">
+            <h3 style="font-size: 20px; font-weight: 700;">Elige tu Avatar Premium</h3>
+            <p style="color: var(--text-dim); font-size:13px; margin-top:5px;">Personaliza la identidad visual de tu cuenta ejecutiva.</p>
+            <div class="avatar-options-grid">
+                <div class="avatar-opt" onclick="selectAvatar('🥷')">🥷</div>
+                <div class="avatar-opt" onclick="selectAvatar('👑')">👑</div>
+                <div class="avatar-opt" onclick="selectAvatar('🦁')">🦁</div>
+                <div class="avatar-opt" onclick="selectAvatar('⚽')">⚽</div>
+                <div class="avatar-opt" onclick="selectAvatar('🏀')">🏀</div>
+                <div class="avatar-opt" onclick="selectAvatar('🏊')">🏊</div>
+                <div class="avatar-opt" onclick="selectAvatar('🔥')">🔥</div>
+                <div class="avatar-opt" onclick="selectAvatar('⚡')">⚡</div>
+            </div>
+            <button class="btn-luxury" style="padding:12px; font-size:14px;" onclick="closeAvatarModal()">Cerrar Ventana</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedSport = "Fútbol";
+        let dbAtletasAll = {}; 
+        let currentAdmin = null;
+
+        let defaultSports = [
+            { name: "Fútbol", icon: "fa-soccer-ball", bg: "linear-gradient(135deg, #f87171, #ef4444, #991b1b)" },
+            { name: "Básquet", icon: "fa-basketball", bg: "linear-gradient(135deg, #fbbf24, #f59e0b, #b45309)" },
+            { name: "Natación", icon: "fa-person-swimming", bg: "linear-gradient(135deg, #60a5fa, #3b82f6, #1d4ed8)" },
+            { name: "Tenis", icon: "fa-table-tennis-paddle-ball", bg: "linear-gradient(135deg, #34d399, #10b981, #065f46)" },
+            { name: "Vóley", icon: "fa-volleyball", bg: "linear-gradient(135deg, #a78bfa, #8b5cf6, #5b21b6)" },
+            { name: "Atletismo", icon: "fa-person-running", bg: "linear-gradient(135deg, #fb7185, #f43f5e, #9f1239)" },
+            { name: "Karate", icon: "fa-dumbbell", bg: "linear-gradient(135deg, #4ade80, #22c55e, #15803d)" }
+        ];
+
+        window.onload = function() {
+            if(!localStorage.getItem('usersDB')) localStorage.setItem('usersDB', JSON.stringify({}));
+            if(!localStorage.getItem('paymentsDB')) localStorage.setItem('paymentsDB', JSON.stringify({}));
+            if(!localStorage.getItem('sportsDB')) localStorage.setItem('sportsDB', JSON.stringify(defaultSports));
+            
+            buildSportsGrids();
+            buildSportsDropdown();
+            renderSavedAccountsList();
+        };
+
+        function toggleAuth(showLogin) {
+            document.getElementById('login-box').style.display = showLogin ? 'block' : 'none';
+            document.getElementById('register-box').style.display = showLogin ? 'none' : 'block';
+        }
+
+        /* --- CUADRÍCULA DE SELECCIÓN INICIAL --- */
+        function buildSportsGrids() {
+            let sportsList = JSON.parse(localStorage.getItem('sportsDB'));
+            let mainGrid = document.getElementById('main-sports-grid');
+            mainGrid.innerHTML = "";
+
+            sportsList.forEach(sport => {
+                let card = document.createElement('div');
+                card.className = 'sport-card';
+                card.style.background = sport.bg || 'linear-gradient(135deg, #3b82f6, #8b5cf6)';
+                card.setAttribute('onclick', `selectSportAndEnter('${sport.name}')`);
+                card.innerHTML = `<i class="fa-solid ${sport.icon || 'fa-dumbbell'}"></i>${sport.name}`;
+                mainGrid.appendChild(card);
+            });
+
+            let addCard = document.createElement('div');
+            addCard.className = 'sport-card';
+            addCard.style.background = 'linear-gradient(135deg, #475569, #334155, #1e293b)';
+            addCard.setAttribute('onclick', 'addNewSport()');
+            addCard.innerHTML = `<i class="fa-solid fa-circle-plus" style="color:#d946ef;"></i>Añadir (+)`;
+            mainGrid.appendChild(addCard);
+        }
+
+        /* --- LISTA DESPLEGABLE EN EL PERFIL --- */
+        function buildSportsDropdown() {
+            let sportsList = JSON.parse(localStorage.getItem('sportsDB'));
+            let dropdown = document.getElementById('profile-sport-dropdown');
+            dropdown.innerHTML = "";
+
+            sportsList.forEach(sport => {
+                let opt = document.createElement('option');
+                opt.value = sport.name;
+                opt.innerText = sport.name;
+                dropdown.appendChild(opt);
+            });
+
+            dropdown.value = selectedSport;
+        }
+
+        function addNewSport() {
+            let name = prompt("Escribe el nombre de la nueva disciplina o deporte:");
+            if(!name || name.trim() === "") return;
+            name = name.trim();
+
+            let sportsList = JSON.parse(localStorage.getItem('sportsDB'));
+            let exists = sportsList.some(s => s.name.toLowerCase() === name.toLowerCase());
+            if(exists) {
+                alert("Esta disciplina ya se encuentra dentro del sistema.");
+                return;
+            }
+
+            let hue1 = Math.floor(Math.random() * 360);
+            let hue2 = (hue1 + 40) % 360;
+            let randomGradient = `linear-gradient(135deg, hsl(${hue1}, 75%, 60%), hsl(${hue2}, 80%, 45%), hsl(${hue2}, 90%, 25%))`;
+
+            sportsList.push({ name: name, icon: "fa-dumbbell", bg: randomGradient });
+            localStorage.setItem('sportsDB', JSON.stringify(sportsList));
+            
+            buildSportsGrids();
+            buildSportsDropdown();
+            alert(`¡Ecosistema para ${name} creado con éxito!`);
+        }
+
+        /* --- LOGIN, AUTENTICACIÓN Y FILTRADO POR CUENTA ADMINISTRATIVA --- */
+        function handleRegister() {
+            let name = document.getElementById('reg-name').value.trim();
+            let email = document.getElementById('reg-email').value.trim().toLowerCase();
+            let pass = document.getElementById('reg-pass').value;
+
+            if(name === "" || email === "" || pass.length < 6) {
+                alert("Por favor llena los campos de forma válida.");
+                return;
+            }
+
+            let usersDB = JSON.parse(localStorage.getItem('usersDB'));
+            if(usersDB[email]) {
+                alert("Este correo ya está registrado.");
+                return;
+            }
+
+            usersDB[email] = { name: name, pass: pass, avatar: "🥷" };
+            localStorage.setItem('usersDB', JSON.stringify(usersDB));
+
+            currentAdmin = email;
+            initSession(name, email, "🥷");
+        }
+
+        function handleLogin() {
+            let email = document.getElementById('login-email').value.trim().toLowerCase();
+            let pass = document.getElementById('login-pass').value;
+            let usersDB = JSON.parse(localStorage.getItem('usersDB'));
+
+            if(usersDB[email] && usersDB[email].pass === pass) {
+                currentAdmin = email;
+                initSession(usersDB[email].name, email, usersDB[email].avatar || "🥷");
+            } else {
+                alert("Credenciales incorrectas.");
+            }
+        }
+
+        function loginWithSavedAccount(email) {
+            let usersDB = JSON.parse(localStorage.getItem('usersDB'));
+            if(usersDB[email]) {
+                currentAdmin = email;
+                initSession(usersDB[email].name, email, usersDB[email].avatar || "🥷");
+            }
+        }
+
+        function initSession(name, email, avatar) {
+            document.getElementById('profile-name').innerText = name;
+            document.getElementById('profile-email-lbl').innerHTML = `<i class="fa-regular fa-envelope"></i> ${email}`;
+            document.getElementById('profile-avatar-display').innerText = avatar;
+            
+            // FILTRADO DE SEGURIDAD EXCLUSIVO: Cargar los pagos pertenecientes ÚNICAMENTE a este administrador
+            let paymentsDB = JSON.parse(localStorage.getItem('paymentsDB'));
+            dbAtletasAll = paymentsDB[email] || {};
+            
+            renderSavedAccountsList();
+
+            document.getElementById('screen-auth').classList.remove('active');
+            document.getElementById('screen-sports-select').classList.add('active');
+        }
+
+        /* --- CONTROL Y FILTRADO POR DISCIPLINA SELECCIONADA --- */
+        function selectSportAndEnter(sportName) {
+            selectedSport = sportName;
+            document.getElementById('profile-sport-dropdown').value = selectedSport;
+            
+            updateBadgesAndStats();
+
+            document.getElementById('screen-sports-select').classList.remove('active');
+            document.getElementById('main-nav').style.display = 'flex';
+            showSection('inicio');
+        }
+
+        function selectSport(sportName) {
+            selectedSport = sportName;
+            updateBadgesAndStats();
+        }
+
+        function updateBadgesAndStats() {
+            document.querySelectorAll('.active-sport-badge').forEach(badge => badge.innerText = selectedSport);
+            document.getElementById('lbl-money-sport').innerText = `Recaudado (${selectedSport})`;
+            document.getElementById('lbl-athletes-sport').innerText = `Atletas (${selectedSport})`;
+            renderFilteredData();
+            updatePremiumStats();
+        }
+
+        /* --- CONTROL DE HISTORIAL EN DISPOSITIVO --- */
+        function renderSavedAccountsList() {
+            let container = document.getElementById('saved-accounts-list-container');
+            container.innerHTML = "";
+            let usersDB = JSON.parse(localStorage.getItem('usersDB'));
+            let keys = Object.keys(usersDB);
+
+            if(keys.length === 0) {
+                container.innerHTML = `<p style="font-size:12px; color:var(--text-dim);">No hay más cuentas en el historial.</p>`;
+                return;
+            }
+
+            keys.forEach(email => {
+                let u = usersDB[email];
+                let row = document.createElement('div');
+                row.className = "account-item-row";
+                row.setAttribute('onclick', `loginWithSavedAccount('${email}')`);
+                row.innerHTML = `
+                    <div class="account-item-left">
+                        <div class="account-item-avatar">${u.avatar || "🥷"}</div>
+                        <div>
+                            <p style="font-weight:600; font-size:14px;">${u.name}</p>
+                            <p style="font-size:11px; color:var(--text-dim);">${email}</p>
+                        </div>
+                    </div>
+                    <button class="account-del-btn" onclick="deleteAccountHistory(event, '${email}')"><i class="fa-solid fa-trash-can"></i></button>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function deleteAccountHistory(e, email) {
+            e.stopPropagation();
+            if(!confirm(`¿Deseas quitar la cuenta de ${email} de este dispositivo?`)) return;
+
+            let usersDB = JSON.parse(localStorage.getItem('usersDB'));
+            delete usersDB[email];
+            localStorage.setItem('usersDB', JSON.stringify(usersDB));
+            
+            if(currentAdmin === email) {
+                logout();
+            } else {
+                renderSavedAccountsList();
+            }
+        }
+
+        /* --- AVATARES --- */
+        function openAvatarModal() { document.getElementById('avatarModal').style.display = 'flex'; }
+        function closeAvatarModal() { document.getElementById('avatarModal').style.display = 'none'; }
+        
+        function selectAvatar(avatarEmoji) {
+            document.getElementById('profile-avatar-display').innerText = avatarEmoji;
+            let usersDB = JSON.parse(localStorage.getItem('usersDB'));
+            if(usersDB[currentAdmin]) {
+                usersDB[currentAdmin].avatar = avatarEmoji;
+                localStorage.setItem('usersDB', JSON.stringify(usersDB));
+            }
+            closeAvatarModal();
+            renderSavedAccountsList();
+        }
+
+        /* --- RENDERIZADO AISLADO POR DISCIPLINA --- */
+        function renderFilteredData() {
+            let tbody = document.getElementById('payments-table-body');
+            let list = document.getElementById('athletes-list');
+            tbody.innerHTML = "";
+            list.innerHTML = "";
+            let athletesInSportCount = 0;
+
+            Object.keys(dbAtletasAll).forEach(key => {
+                let athleteObj = dbAtletasAll[key];
+                
+                // CRUCIAL: Solo se procesan y añaden los datos que correspondan exactamente al deporte activo
+                if (athleteObj.deporte === selectedSport) {
+                    athletesInSportCount++;
+                    let containerBlock = document.createElement('div');
+                    containerBlock.className = 'athlete-container-block';
+                    containerBlock.id = `block-${key}`;
+                    
+                    let historialHtml = "";
+                    athleteObj.historial.forEach(p => {
+                        historialHtml += `
+                            <div class="history-item">
+                                <span>${p.fecha} - <strong>$${p.monto}</strong> (${p.metodo})</span>
+                                ${p.estadoBadge}
+                            </div>
+                        `;
+                        let row = document.createElement('tr');
+                        row.innerHTML = `<td>${p.fecha}</td><td class="pay-name-cell"><strong>${athleteObj.nombre}</strong></td><td>${athleteObj.deporte}</td><td>$${p.monto}</td><td class="pay-method-cell">${p.metodo}</td><td>${p.estadoBadge}</td>`;
+                        tbody.insertBefore(row, tbody.firstChild);
+                    });
+
+                    containerBlock.innerHTML = `
+                        <div class="athlete-card-premium">
+                            <div class="athlete-info">
+                                <i class="fa-solid fa-user-ninja"></i>
+                                <div>
+                                    <p class="athlete-name-search" style="font-weight: 600; font-size:16px;">${athleteObj.nombre}</p>
+                                    <p style="font-size: 12px; color: var(--text-dim);">Disciplina: ${athleteObj.deporte}</p>
+                                </div>
+                            </div>
+                            <div class="athlete-stats">
+                                <button class="count-badge" onclick="toggleHistoryPanel('${key}')">
+                                    <span id="count-text-${key}">${athleteObj.pagosRealizados} pagos</span> <i class="fa-solid fa-chevron-down" style="font-size:10px;"></i>
+                                </button>
+                                <p style="font-size: 11px; color: var(--text-dim); margin-top:6px;" id="total-${key}">Total: $${athleteObj.montoTotal.toFixed(2)}</p>
+                            </div>
+                        </div>
+                        <div class="athlete-history-panel" id="history-panel-${key}">
+                            ${historialHtml}
+                        </div>
+                    `;
+                    list.insertBefore(containerBlock, list.firstChild);
+                }
+            });
+
+            if (athletesInSportCount === 0) {
+                list.innerHTML = `<p id="empty-athletes-msg" style="color: var(--text-dim); text-align: center; padding: 20px;">No hay atletas registrados en ${selectedSport} aún.</p>`;
+            }
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+            document.getElementById('sec-' + sectionId).classList.add('active');
+            document.getElementById('nav-' + sectionId).classList.add('active');
+            renderFilteredData();
+            updatePremiumStats();
+        }
+
+        /* --- PERSISTENCIA Y GUARDADO SEGURO POR USUARIO --- */
+        function saveData() {
+            let athlete = document.getElementById('input-athlete-name').value.trim();
+            let amount = document.getElementById('input-payment-amount').value;
+            let type = document.getElementById('input-payment-type').value;
+            let status = document.getElementById('input-payment-status').value;
+
+            if(athlete === "" || amount.trim() === "") {
+                alert("Por favor completa los campos.");
+                return;
+            }
+
+            let today = new Date();
+            let formatData = today.getDate() + '/' + (today.getMonth()+1) + '/' + today.getFullYear();
+            let statusBadge = status === 'Completado' 
+                ? `<span class="status-badge status-completed"><i class="fa-solid fa-circle-check"></i>Completado</span>`
+                : `<span class="status-badge status-pending"><i class="fa-solid fa-clock"></i>Pendiente</span>`;
+
+            let nuevoPagoHistorial = { fecha: formatData, monto: parseFloat(amount).toFixed(2), metodo: type, estadoBadge: statusBadge };
+            let athleteKey = (athlete + "-" + selectedSport).toLowerCase();
+            
+            if (dbAtletasAll[athleteKey]) {
+                dbAtletasAll[athleteKey].pagosRealizados += 1;
+                dbAtletasAll[athleteKey].montoTotal += parseFloat(amount);
+                dbAtletasAll[athleteKey].historial.unshift(nuevoPagoHistorial);
+            } else {
+                dbAtletasAll[athleteKey] = { nombre: athlete, deporte: selectedSport, pagosRealizados: 1, montoTotal: parseFloat(amount), historial: [nuevoPagoHistorial] };
+            }
+
+            // Guardar asociando los datos únicamente al 'currentAdmin' (cuenta logueada)
+            let paymentsDB = JSON.parse(localStorage.getItem('paymentsDB'));
+            paymentsDB[currentAdmin] = dbAtletasAll;
+            localStorage.setItem('paymentsDB', JSON.stringify(paymentsDB));
+
+            updateBadgesAndStats();
+            alert("¡Transacción guardada con éxito!");
+            document.getElementById('input-athlete-name').value = "";
+            document.getElementById('input-payment-amount').value = "";
+        }
+
+        function updatePremiumStats() {
+            let totalMoneySport = 0;
+            let totalAthletesSport = 0;
+
+            Object.keys(dbAtletasAll).forEach(key => {
+                let athleteObj = dbAtletasAll[key];
+                if (athleteObj.deporte === selectedSport) {
+                    totalAthletesSport++;
+                    totalMoneySport += athleteObj.montoTotal;
+                }
+            });
+
+            document.getElementById('stat-total-money').innerText = `$${totalMoneySport.toFixed(2)}`;
+            document.getElementById('stat-total-athletes').innerText = totalAthletesSport;
+        }
+
+        function toggleHistoryPanel(athleteKey) {
+            let panel = document.getElementById(`history-panel-${athleteKey}`);
+            panel.style.display = panel.style.display === "block" ? "none" : "block";
+        }
+
+        function filterPayments() {
+            let query = document.getElementById('search-payments').value.toLowerCase();
+            document.querySelectorAll('#payments-table-body tr').forEach(row => {
+                let name = row.querySelector('.pay-name-cell').innerText.toLowerCase();
+                row.style.display = name.includes(query) ? "" : "none";
+            });
+        }
+
+        function filterAthletes() {
+            let query = document.getElementById('search-athletes').value.toLowerCase();
+            document.querySelectorAll('.athlete-container-block').forEach(block => {
+                let name = block.querySelector('.athlete-name-search').innerText.toLowerCase();
+                block.style.display = name.includes(query) ? "" : "none";
+            });
+        }
+
+        function logout() { 
+            currentAdmin = null;
+            dbAtletasAll = {};
+            document.getElementById('main-nav').style.display = 'none';
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen-auth').classList.add('active');
+            renderSavedAccountsList();
+        }
+        
+        function changeFont(fontName) { document.body.style.fontFamily = fontName + ', sans-serif'; }
+
+        function setTheme(theme) {
+            if(theme === 'pink') { document.body.className = 'pink-premium-mode'; }
+            else {
+                document.body.className = '';
+                if(theme === 'dark') {
+                    document.documentElement.style.setProperty('--bg-color', '#02040a');
+                    document.documentElement.style.setProperty('--primary-gradient', 'linear-gradient(135deg, #4f46e5 0%, #a855f7 50%, #db2777 100%)');
+                } else if(theme === 'purple') {
+                    document.documentElement.style.setProperty('--bg-color', '#0a0f24');
+                    document.documentElement.style.setProperty('--primary-gradient', 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 50%, #6366f1 100%)');
+                } else {
+                    document.documentElement.style.setProperty('--bg-color', '#060913');
+                    document.documentElement.style.setProperty('--primary-gradient', 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #d946ef 100%)');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
